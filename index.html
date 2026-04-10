@@ -1,25 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humidity and Health Risk Chart</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a2e;
+    color: #e8e8e2;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 1.5rem;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #e8e8e2;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #a0a09a;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: #a0a09a;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-line {
+    display: inline-block;
+    height: 3px;
+    width: 24px;
+    border-radius: 2px;
+  }
+  .legend-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  .footnote {
+    font-size: 10px;
+    color: #70706a;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
 
-<h2 class="sr-only">Chart showing how mold growth, viral transmission, and asthma risk each vary across the humidity spectrum, with a recommended healthy zone of 35–50% RH where all three risks are minimized.</h2>
+<h1>Relative humidity and indoor health risk</h1>
+<p class="subtitle">The 35–50% RH zone minimises mold growth, viral transmission, and asthma risk simultaneously.</p>
 
-<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;font-size:13px;color:var(--color-text-secondary);">
-  <span style="display:flex;align-items:center;gap:6px;"><span style="width:28px;height:3px;background:#D85A30;display:inline-block;"></span>Mold / fungi growth</span>
-  <span style="display:flex;align-items:center;gap:6px;"><span style="width:18px;height:3px;background:#185FA5;display:inline-block;"></span><span style="width:8px;height:3px;background:#185FA5;display:inline-block;margin-left:2px;"></span>Viral transmission</span>
-  <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#854F0B;display:inline-block;"></span>Asthma / allergic rhinitis</span>
+<div class="legend">
+  <span class="legend-item"><span class="legend-line" style="background:#F0997B;"></span>Mold / fungi growth</span>
+  <span class="legend-item">
+    <span style="display:inline-flex;gap:2px;align-items:center;">
+      <span class="legend-line" style="background:#85B7EB;width:16px;"></span>
+      <span class="legend-line" style="background:#85B7EB;width:8px;"></span>
+    </span>
+    Viral transmission
+  </span>
+  <span class="legend-item"><span class="legend-box" style="background:#EF9F27;"></span>Asthma / allergic rhinitis</span>
 </div>
 
-<div style="position:relative;width:100%;height:320px;">
-  <canvas id="humChart" role="img" aria-label="Line chart showing mold growth risk, viral transmission risk, and asthma risk across relative humidity from 10% to 90%. All three risks are lowest between 35% and 50% RH.">Mold risk is low below 60% RH and rises sharply above. Viral transmission is highest below 30% and above 70%. Asthma risk is elevated at both extremes with a trough at 40–50%. The optimal zone is 35–50% RH.</canvas>
+<div class="chart-wrap">
+  <canvas id="humChart" role="img" aria-label="Line chart showing mold growth risk, viral transmission risk, and asthma risk across relative humidity from 10% to 90%. All three risks are lowest between 35% and 50% RH.">Mold risk rises sharply above 60% RH. Viral transmission peaks below 30% and above 70%. Asthma risk is elevated at both extremes. The optimal zone is 35–50% RH.</canvas>
 </div>
+
+<p class="footnote">
+  Curves are schematic representations based on Sterling (1985), Lowen et al. (2007), Shaman &amp; Kaplan (2009), and ASHRAE Standard 55. Relative risk normalised to 0–100 for cross-category comparability. Recommended zone (35–50% RH) reflects Southeast U.S. climate conditions; 40–55% RH is the broader WHO/ASHRAE consensus for temperate climates.
+</p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 (function() {
 
 var labels = ['10','15','20','25','30','35','40','45','50','55','60','65','70','75','80','85','90'];
-
 var mold   = [2,  2,  3,  3,  4,  5,  7,  9, 14, 22, 42, 65, 80, 88, 93, 97,100];
 var viral  = [90, 82, 70, 55, 40, 28, 18, 14, 15, 20, 30, 42, 55, 68, 78, 88, 95];
 var asthma = [75, 65, 55, 45, 35, 22, 14, 11, 13, 18, 26, 36, 50, 62, 72, 82, 90];
+
+var gridColor  = 'rgba(255,255,255,0.08)';
+var tickColor  = '#a0a09a';
+var titleColor = '#c8c8c2';
 
 new Chart(document.getElementById('humChart'), {
   type: 'line',
@@ -29,7 +105,7 @@ new Chart(document.getElementById('humChart'), {
       {
         label: 'Mold / fungi growth',
         data: mold,
-        borderColor: '#D85A30',
+        borderColor: '#F0997B',
         backgroundColor: 'transparent',
         borderWidth: 2.5,
         pointRadius: 0,
@@ -39,7 +115,7 @@ new Chart(document.getElementById('humChart'), {
       {
         label: 'Viral transmission',
         data: viral,
-        borderColor: '#185FA5',
+        borderColor: '#85B7EB',
         backgroundColor: 'transparent',
         borderWidth: 2.5,
         pointRadius: 0,
@@ -49,7 +125,7 @@ new Chart(document.getElementById('humChart'), {
       {
         label: 'Asthma / allergic rhinitis',
         data: asthma,
-        borderColor: '#BA7517',
+        borderColor: '#EF9F27',
         backgroundColor: 'transparent',
         borderWidth: 2.5,
         pointRadius: 0,
@@ -65,31 +141,31 @@ new Chart(document.getElementById('humChart'), {
     plugins: {
       legend: { display: false },
       tooltip: {
+        backgroundColor: 'rgba(10,10,20,0.9)',
+        titleColor: '#e8e8e2',
+        bodyColor: '#a0a09a',
         callbacks: {
           title: function(items) { return items[0].label + '% RH'; },
           label: function(item) { return item.dataset.label + ': ' + Math.round(item.raw) + ' (relative risk)'; }
         }
-      },
-      annotation: {}
+      }
     },
     scales: {
       x: {
         title: {
           display: true,
           text: 'relative humidity (%)',
-          color: '#888780',
+          color: titleColor,
           font: { size: 12 }
         },
         ticks: {
-          color: '#888780',
+          color: tickColor,
           font: { size: 11 },
-          callback: function(val, i) {
-            return labels[i] + '%';
-          },
+          callback: function(val, i) { return labels[i] + '%'; },
           autoSkip: false,
           maxRotation: 0
         },
-        grid: { color: 'rgba(136,135,128,0.15)' }
+        grid: { color: gridColor }
       },
       y: {
         min: 0,
@@ -97,11 +173,11 @@ new Chart(document.getElementById('humChart'), {
         title: {
           display: true,
           text: 'relative risk (0 = lowest, 100 = highest)',
-          color: '#888780',
+          color: titleColor,
           font: { size: 12 }
         },
-        ticks: { color: '#888780', font: { size: 11 }, stepSize: 20 },
-        grid: { color: 'rgba(136,135,128,0.15)' }
+        ticks: { color: tickColor, font: { size: 11 }, stepSize: 20 },
+        grid: { color: gridColor }
       }
     }
   },
@@ -111,29 +187,27 @@ new Chart(document.getElementById('humChart'), {
       var ctx = chart.ctx;
       var xAxis = chart.scales.x;
       var yAxis = chart.scales.y;
-
       var x35 = xAxis.getPixelForValue(labels.indexOf('35'));
       var x50 = xAxis.getPixelForValue(labels.indexOf('50'));
       var yTop = yAxis.top;
       var yBot = yAxis.bottom;
 
       ctx.save();
-      ctx.fillStyle = 'rgba(63,160,90,0.12)';
+      ctx.fillStyle = 'rgba(63,160,90,0.15)';
       ctx.fillRect(x35, yTop, x50 - x35, yBot - yTop);
 
-      ctx.strokeStyle = 'rgba(63,160,90,0.5)';
+      ctx.strokeStyle = 'rgba(100,200,120,0.45)';
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 3]);
       ctx.beginPath(); ctx.moveTo(x35, yTop); ctx.lineTo(x35, yBot); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(x50, yTop); ctx.lineTo(x50, yBot); ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = 'rgba(30,120,60,0.85)';
+      ctx.fillStyle = 'rgba(120,220,150,0.9)';
       ctx.font = '500 11px Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('recommended', (x35 + x50) / 2, yTop + 14);
       ctx.fillText('35–50% RH', (x35 + x50) / 2, yTop + 27);
-
       ctx.restore();
     }
   }]
@@ -141,7 +215,5 @@ new Chart(document.getElementById('humChart'), {
 
 })();
 </script>
-
-<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:10px;line-height:1.6;">
-  Curves are schematic representations based on Sterling (1985), Lowen et al. (2007), Shaman &amp; Kohn (2009), and ASHRAE Standard 55. Relative risk is normalised to 0–100 for comparability across categories. The recommended zone (35–50% RH) reflects the range where all three risk curves simultaneously reach or approach their minima.
-</div>
+</body>
+</html>
